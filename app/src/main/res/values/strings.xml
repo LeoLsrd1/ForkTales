@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">ForkTales</string>
+    <string name="home">Home</string>
+    <string name="recipe">Recipe</string>
+    <string name="favorites">Favorites</string>
+    <string name="profile">Profile</string>
 </resources>
