@@ -22,7 +22,7 @@ val bodyFontFamily = FontFamily(
 
 val displayFontFamily = FontFamily(
     Font(
-        googleFont = GoogleFont("Cinzel"),
+        googleFont = GoogleFont("Lobster Two"),
         fontProvider = provider,
     )
 )
