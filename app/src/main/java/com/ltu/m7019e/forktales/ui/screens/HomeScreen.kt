@@ -5,15 +5,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,26 +26,44 @@ import com.ltu.m7019e.forktales.database.Recipes
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onRecipeListItemClicked: (Recipe) -> Unit
 ) {
     val recipes = Recipes().getRecipes()
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background,
-        contentColor = MaterialTheme.colorScheme.onBackground
+    LazyColumn(
+        contentPadding = PaddingValues(vertical = 16.dp)
     ) {
-        LazyColumn(
-            contentPadding = PaddingValues(vertical = 16.dp)
-        ) {
-            item {
-                RecipeList(recipeList = recipes, title = "Sea Food", modifier = modifier)
-                Spacer(modifier = Modifier.size(32.dp))
-                RecipeList(recipeList = recipes, title = "Meat", modifier = modifier)
-                Spacer(modifier = Modifier.size(32.dp))
-                RecipeList(recipeList = recipes, title = "Vegetarian", modifier = modifier)
-            }
+        item {
+            RecipeList(
+                recipeList = recipes,
+                title = "Sea Food",
+                modifier = modifier,
+                onRecipeListItemClicked = onRecipeListItemClicked
+            )
+            Spacer(modifier = Modifier.size(32.dp))
+            RecipeList(
+                recipeList = recipes,
+                title = "Meat",
+                modifier = modifier,
+                onRecipeListItemClicked = onRecipeListItemClicked
+            )
+            Spacer(modifier = Modifier.size(32.dp))
+            RecipeList(
+                recipeList = recipes,
+                title = "Vegetarian",
+                modifier = modifier,
+                onRecipeListItemClicked = onRecipeListItemClicked
+            )
+            Spacer(modifier = Modifier.size(32.dp))
+            RecipeList(
+                recipeList = recipes,
+                title = "Discover",
+                modifier = modifier,
+                onRecipeListItemClicked = onRecipeListItemClicked
+            )
         }
     }
+
 }
 
 @Composable
@@ -54,6 +71,7 @@ fun RecipeList(
     modifier: Modifier = Modifier,
     title: String = "",
     recipeList: List<Recipe>,
+    onRecipeListItemClicked: (Recipe) -> Unit
 ) {
     Column {
         Text(
@@ -67,19 +85,24 @@ fun RecipeList(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(recipeList) { recipe ->
-                RecipeCard(recipe = recipe)
+                RecipeCard(recipe = recipe, onRecipeListItemClicked = onRecipeListItemClicked)
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeCard(
-    recipe: Recipe
+    recipe: Recipe,
+    onRecipeListItemClicked: (Recipe) -> Unit
 ) {
     Card(
         modifier = Modifier
-            .size(200.dp, 290.dp)
+            .size(200.dp, 290.dp),
+        onClick = {
+            onRecipeListItemClicked(recipe)
+        }
     ) {
         Column {
             Box {
@@ -98,12 +121,14 @@ fun RecipeCard(
                     text = recipe.strMeal,
                     style = MaterialTheme.typography.bodyLarge,
                     overflow = TextOverflow.Ellipsis,
-                    maxLines = 2
+                    maxLines = 2,
                 )
                 Spacer(modifier = Modifier.size(4.dp))
                 Text(
-                    text = "${recipe.strCategory} - ${recipe.strArea}",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = "${recipe.strArea} - ${recipe.strTags}",
+                    style = MaterialTheme.typography.labelLarge,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1
                 )
             }
         }
@@ -121,6 +146,7 @@ fun PreviewRecipeCard() {
             strArea = "Italian",
             strInstructions = "Cook the pasta, fry the bacon, mix the eggs and cheese, combine everything",
             strMealThumb = "https://www.themealdb.com/images/media/meals/58oia61564916529.jpg"
-        )
+        ),
+        onRecipeListItemClicked = {}
     )
 }

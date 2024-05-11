@@ -5,5 +5,6 @@ object Constants {
     const val RANDOM_RECIPE = "/random.php"
     const val FILTER_BY_CATEGORY = "/filter.php?c="
     const val LIST_ALL_CATEGORIES = "/categories.php"
+    const val INGREDIENT_IMAGE = "https://www.themealdb.com/images/ingredients/"
     const val API_KEY = 1
 }

@@ -10,17 +10,19 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.MoreVert
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
@@ -31,11 +33,14 @@ import androidx.navigation.compose.rememberNavController
 import com.ltu.m7019e.forktales.ui.screens.FavoritesScreen
 import com.ltu.m7019e.forktales.ui.screens.HomeScreen
 import com.ltu.m7019e.forktales.ui.screens.ProfileScreen
+import com.ltu.m7019e.forktales.ui.screens.RecipeDetailScreen
+import com.ltu.m7019e.forktales.viewmodel.ForkTalesViewModel
 
-sealed class ForkTalesNavItem(val route: String, val iconFilled: ImageVector, val iconOutlined: ImageVector, @StringRes val resourceId: Int) {
-    data object Home : ForkTalesNavItem("home", Icons.Default.Home, Icons.Outlined.Home, R.string.home)
-    data object Favorites : ForkTalesNavItem("favorites", Icons.Default.Favorite, Icons.Outlined.FavoriteBorder, R.string.favorites)
-    data object Profile : ForkTalesNavItem("profile", Icons.Default.Person, Icons.Outlined.Person, R.string.profile)
+sealed class ForkTalesNavScreen(val route: String, val iconFilled: ImageVector, val iconOutlined: ImageVector, @StringRes val resourceId: Int) {
+    data object Home : ForkTalesNavScreen("home", Icons.Default.Home, Icons.Outlined.Home, R.string.home)
+    data object Favorites : ForkTalesNavScreen("favorites", Icons.Default.Favorite, Icons.Outlined.FavoriteBorder, R.string.favorites)
+    data object Search : ForkTalesNavScreen("search", Icons.Default.Search, Icons.Outlined.Search, R.string.search)
+    data object RecipeDetail : ForkTalesNavScreen("recipeDetail", Icons.Default.MoreVert, Icons.Outlined.MoreVert, R.string.recipe_detail)
 }
 
 /**
@@ -45,12 +50,15 @@ sealed class ForkTalesNavItem(val route: String, val iconFilled: ImageVector, va
 fun ForkTalesApp(
     navController: NavHostController = rememberNavController(),
 ) {
+    val forkTalesViewModel: ForkTalesViewModel = viewModel()
     val items = listOf(
-        ForkTalesNavItem.Home,
-        ForkTalesNavItem.Favorites,
-        ForkTalesNavItem.Profile
+        ForkTalesNavScreen.Home,
+        ForkTalesNavScreen.Favorites,
+        ForkTalesNavScreen.Search
     )
     Scaffold(
+        backgroundColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
         bottomBar = {
             BottomNavigation(
                 backgroundColor = MaterialTheme.colorScheme.background,
@@ -90,10 +98,23 @@ fun ForkTalesApp(
             }
         }
     ) { innerPadding ->
-        NavHost(navController = navController, startDestination = ForkTalesNavItem.Home.route, modifier = Modifier.padding(innerPadding)) {
-            composable(ForkTalesNavItem.Home.route) { HomeScreen() }
-            composable(ForkTalesNavItem.Favorites.route) { FavoritesScreen() }
-            composable(ForkTalesNavItem.Profile.route) { ProfileScreen() }
+        NavHost(navController = navController, startDestination = ForkTalesNavScreen.Home.route, modifier = Modifier.padding(innerPadding)) {
+            composable(ForkTalesNavScreen.Home.route) {
+                HomeScreen(
+                    onRecipeListItemClicked = {
+                        forkTalesViewModel.selectedRecipe = it
+                        navController.navigate(ForkTalesNavScreen.RecipeDetail.route)
+                    }
+                )
+            }
+            composable(ForkTalesNavScreen.Search.route) { ProfileScreen() }
+            composable(ForkTalesNavScreen.Favorites.route) { FavoritesScreen() }
+            composable(ForkTalesNavScreen.RecipeDetail.route) {
+                RecipeDetailScreen(
+                    forkTalesViewModel = forkTalesViewModel,
+                    navigateUp = { navController.navigateUp() }
+                )
+            }
         }
     }
     

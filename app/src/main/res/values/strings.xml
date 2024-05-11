@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">ForkTales</string>
     <string name="home">Home</string>
-    <string name="recipe">Recipe</string>
+    <string name="recipe_detail">Recipe Detail</string>
     <string name="favorites">Favorites</string>
+    <string name="search">Search</string>
     <string name="profile">Profile</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="back">Back</string>
 </resources>
