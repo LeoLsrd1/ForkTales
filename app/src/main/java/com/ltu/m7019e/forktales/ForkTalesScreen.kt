@@ -36,6 +36,10 @@ import com.ltu.m7019e.forktales.ui.screens.ProfileScreen
 import com.ltu.m7019e.forktales.ui.screens.RecipeDetailScreen
 import com.ltu.m7019e.forktales.viewmodel.ForkTalesViewModel
 
+/**
+ * A sealed class representing the different screens in the navigation of the app.
+ * Each screen is represented by a route, an icon for when it's selected, an icon for when it's not selected, and a string resource id for its title.
+ */
 sealed class ForkTalesNavScreen(val route: String, val iconFilled: ImageVector, val iconOutlined: ImageVector, @StringRes val resourceId: Int) {
     data object Home : ForkTalesNavScreen("home", Icons.Default.Home, Icons.Outlined.Home, R.string.home)
     data object Favorites : ForkTalesNavScreen("favorites", Icons.Default.Favorite, Icons.Outlined.FavoriteBorder, R.string.favorites)
@@ -45,6 +49,9 @@ sealed class ForkTalesNavScreen(val route: String, val iconFilled: ImageVector, 
 
 /**
  * A composable function that displays the bottom navigation bar for the app.
+ * It uses a Scaffold to provide a consistent layout structure for the app.
+ * The bottom navigation bar is created using a BottomNavigation composable, and each item in the navigation bar is a BottomNavigationItem.
+ * The navigation between different screens is handled by a NavHost.
  */
 @Composable
 fun ForkTalesApp(
@@ -73,7 +80,7 @@ fun ForkTalesApp(
                                 if (isSelected) screen.iconFilled else screen.iconOutlined,
                                 contentDescription = null
                             )
-                               },
+                        },
                         label = { Text(text = stringResource(id = screen.resourceId)) },
                         selected = isSelected,
                         onClick = {
@@ -117,5 +124,5 @@ fun ForkTalesApp(
             }
         }
     }
-    
+
 }

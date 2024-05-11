@@ -24,6 +24,13 @@ import com.ltu.m7019e.forktales.model.Recipe
 import coil.compose.AsyncImage
 import com.ltu.m7019e.forktales.database.Recipes
 
+/**
+ * This is a Composable function that displays the home screen of the application.
+ * It displays a list of recipes in different categories.
+ *
+ * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
+ * @param onRecipeListItemClicked A function that is invoked when a recipe list item is clicked.
+ */
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -66,6 +73,15 @@ fun HomeScreen(
 
 }
 
+/**
+ * This is a Composable function that displays a list of recipes.
+ * It takes a list of recipes, a title, a modifier, and a function to be invoked when a recipe list item is clicked.
+ *
+ * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
+ * @param title The title of the recipe list.
+ * @param recipeList The list of recipes to be displayed.
+ * @param onRecipeListItemClicked A function that is invoked when a recipe list item is clicked.
+ */
 @Composable
 fun RecipeList(
     modifier: Modifier = Modifier,
@@ -91,6 +107,13 @@ fun RecipeList(
     }
 }
 
+/**
+ * This is a Composable function that displays a recipe card.
+ * It takes a recipe and a function to be invoked when the recipe card is clicked.
+ *
+ * @param recipe The recipe to be displayed.
+ * @param onRecipeListItemClicked A function that is invoked when the recipe card is clicked.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeCard(
@@ -134,6 +157,7 @@ fun RecipeCard(
         }
     }
 }
+
 
 @Preview
 @Composable

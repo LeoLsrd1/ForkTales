@@ -38,6 +38,15 @@ import com.ltu.m7019e.forktales.model.Recipe
 import com.ltu.m7019e.forktales.utils.Constants
 import com.ltu.m7019e.forktales.viewmodel.ForkTalesViewModel
 
+/**
+ * This is a Composable function that displays the details of a selected recipe.
+ * It uses the ForkTalesViewModel to get the selected recipe and displays its details.
+ * It also provides a navigation up function to go back to the previous screen.
+ *
+ * @param forkTalesViewModel The ViewModel that provides the selected recipe.
+ * @param navigateUp A function that navigates up in the navigation stack.
+ * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
@@ -54,7 +63,7 @@ fun RecipeDetailScreen(
                     text = recipe.strMeal,
                     style = MaterialTheme.typography.headlineMedium
                 )
-                    },
+            },
             navigationIcon = {
                 IconButton(onClick = { navigateUp() }) {
                     Icon(
@@ -138,6 +147,12 @@ fun RecipeDetailScreen(
     }
 }
 
+/**
+ * This is a Composable function that displays a grid of ingredients for a given recipe.
+ * It takes a Recipe object as a parameter and displays its ingredients in a grid format.
+ *
+ * @param recipe The Recipe object whose ingredients are to be displayed.
+ */
 @Composable
 fun IngredientsGrid(
     recipe: Recipe,
@@ -194,6 +209,13 @@ fun IngredientsGrid(
     }
 }
 
+/**
+ * This is a Composable function that displays an ingredient card.
+ * It takes an ingredient and its measure as parameters and displays them in a card format.
+ *
+ * @param ingredient The ingredient to be displayed.
+ * @param measure The measure of the ingredient to be displayed.
+ */
 @Composable
 fun IngredientCard(
     ingredient: String,
@@ -201,8 +223,8 @@ fun IngredientCard(
 ) {
 
     Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Card {
             Box(
                 modifier = Modifier.padding(8.dp)
