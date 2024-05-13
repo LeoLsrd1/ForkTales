@@ -52,12 +52,14 @@ sealed class ForkTalesNavScreen(val route: String, val iconFilled: ImageVector, 
  * It uses a Scaffold to provide a consistent layout structure for the app.
  * The bottom navigation bar is created using a BottomNavigation composable, and each item in the navigation bar is a BottomNavigationItem.
  * The navigation between different screens is handled by a NavHost.
+ *
+ * @param navController The navigation controller used to navigate between different screens.
  */
 @Composable
 fun ForkTalesApp(
     navController: NavHostController = rememberNavController(),
 ) {
-    val forkTalesViewModel: ForkTalesViewModel = viewModel()
+    val forkTalesViewModel: ForkTalesViewModel = viewModel(factory = ForkTalesViewModel.Factory)
     val items = listOf(
         ForkTalesNavScreen.Home,
         ForkTalesNavScreen.Favorites,
@@ -84,17 +86,11 @@ fun ForkTalesApp(
                         label = { Text(text = stringResource(id = screen.resourceId)) },
                         selected = isSelected,
                         onClick = {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
                             navController.navigate(screen.route) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }
-                                // Avoid multiple copies of the same destination when
-                                // reselecting the same item
                                 launchSingleTop = true
-                                // Restore state when reselecting a previously selected item
                                 restoreState = true
                             }
                         },
@@ -108,8 +104,11 @@ fun ForkTalesApp(
         NavHost(navController = navController, startDestination = ForkTalesNavScreen.Home.route, modifier = Modifier.padding(innerPadding)) {
             composable(ForkTalesNavScreen.Home.route) {
                 HomeScreen(
+                    recipeListUiState = forkTalesViewModel.recipeListUiState,
+                    categoriesFlow = forkTalesViewModel.categories,
                     onRecipeListItemClicked = {
-                        forkTalesViewModel.selectedRecipe = it
+                        forkTalesViewModel.selectedRecipeName = it.strMeal
+                        forkTalesViewModel.getRecipeDetailsById(it.idMeal)
                         navController.navigate(ForkTalesNavScreen.RecipeDetail.route)
                     }
                 )
@@ -118,11 +117,11 @@ fun ForkTalesApp(
             composable(ForkTalesNavScreen.Favorites.route) { FavoritesScreen() }
             composable(ForkTalesNavScreen.RecipeDetail.route) {
                 RecipeDetailScreen(
-                    forkTalesViewModel = forkTalesViewModel,
+                    recipeDetailsUiState = forkTalesViewModel.recipeDetailsUiState,
+                    recipeName = forkTalesViewModel.selectedRecipeName,
                     navigateUp = { navController.navigateUp() }
                 )
             }
         }
     }
-
 }

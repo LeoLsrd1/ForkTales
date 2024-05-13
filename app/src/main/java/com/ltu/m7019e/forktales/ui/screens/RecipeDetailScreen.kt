@@ -30,38 +30,41 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ltu.m7019e.forktales.R
-import com.ltu.m7019e.forktales.model.Recipe
+import com.ltu.m7019e.forktales.model.RecipeDetails
 import com.ltu.m7019e.forktales.utils.Constants
-import com.ltu.m7019e.forktales.viewmodel.ForkTalesViewModel
+import com.ltu.m7019e.forktales.viewmodel.RecipeDetailsUiState
 
 /**
  * This is a Composable function that displays the details of a selected recipe.
  * It uses the ForkTalesViewModel to get the selected recipe and displays its details.
  * It also provides a navigation up function to go back to the previous screen.
  *
- * @param forkTalesViewModel The ViewModel that provides the selected recipe.
+ * @param recipeDetailsUiState The UI state of the recipe details.
+ * @param recipeName The name of the recipe.
  * @param navigateUp A function that navigates up in the navigation stack.
  * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
-    forkTalesViewModel: ForkTalesViewModel,
+    recipeDetailsUiState: RecipeDetailsUiState,
+    recipeName: String,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    val recipe: Recipe = forkTalesViewModel.selectedRecipe
     Column {
         CenterAlignedTopAppBar(
             title = {
                 Text(
-                    text = recipe.strMeal,
-                    style = MaterialTheme.typography.headlineMedium
+                    text = recipeName,
+                    style = MaterialTheme.typography.headlineMedium,
+                    textAlign = TextAlign.Center
                 )
             },
             navigationIcon = {
@@ -73,89 +76,117 @@ fun RecipeDetailScreen(
                 }
             }
         )
-        LazyColumn(
-            contentPadding = PaddingValues(bottom = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(32.dp),
-        ){
-            item {
-                Box {
-                    AsyncImage(
-                        model = recipe.strMealThumb,
-                        contentDescription = recipe.strMeal,
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(4 / 3f)
-                    )
-                }
-                Text(
-                    text = "${recipe.strArea} | ${recipe.strTags}",
-                    style = MaterialTheme.typography.bodyMedium,
-                )
-            }
-
-            item {
-                Text(
-                    text = stringResource(R.string.ingredients),
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                IngredientsGrid(recipe = recipe)
-            }
-
-            item {
-                Text(
-                    text = "Instructions",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Spacer(modifier = Modifier.size(16.dp))
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+        when (recipeDetailsUiState) {
+            is RecipeDetailsUiState.Success -> {
+                val recipe = recipeDetailsUiState.recipe
+                LazyColumn(
+                    contentPadding = PaddingValues(bottom = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(32.dp),
                 ) {
-                    Text(
-                        text = recipe.strInstructions,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(8.dp),
-                    )
+                    item {
+                        Box {
+                            AsyncImage(
+                                model = recipe.strMealThumb,
+                                contentDescription = recipe.strMeal,
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .aspectRatio(4 / 3f)
+                            )
+                        }
+                        if (recipe.strArea != "" && recipe.strTags != "") {
+                            Text(
+                                text = "${recipe.strArea} | ${recipe.strTags}",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        } else {
+                            Text(
+                                text = "${recipe.strArea}${recipe.strTags}",
+                                style = MaterialTheme.typography.bodyMedium,
+                            )
+                        }
+                    }
+
+                    item {
+                        Text(
+                            text = stringResource(R.string.ingredients),
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Spacer(modifier = Modifier.size(16.dp))
+                        IngredientsGrid(recipe = recipe)
+                    }
+
+                    item {
+                        Text(
+                            text = "Instructions",
+                            style = MaterialTheme.typography.headlineSmall
+                        )
+                        Spacer(modifier = Modifier.size(16.dp))
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                        ) {
+                            Text(
+                                text = recipe.strInstructions,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.padding(8.dp),
+                            )
+                        }
+                        Spacer(modifier = Modifier.size(16.dp))
+                        Text(
+                            text = recipe.strYoutube,
+                            style = MaterialTheme.typography.bodySmall,
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.clickable {
+                                val intent =
+                                    Intent(Intent.ACTION_VIEW, Uri.parse(recipe.strYoutube))
+                                context.startActivity(intent)
+                            }
+                        )
+                        Spacer(modifier = Modifier.size(4.dp))
+                        Text(
+                            text = recipe.strSource,
+                            style = MaterialTheme.typography.bodySmall,
+                            textDecoration = TextDecoration.Underline,
+                            modifier = Modifier.clickable {
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(recipe.strSource))
+                                context.startActivity(intent)
+                            }
+                        )
+                    }
                 }
-                Spacer(modifier = Modifier.size(16.dp))
+            }
+
+            RecipeDetailsUiState.Loading -> {
                 Text(
-                    text = recipe.strYoutube,
+                    text = "Loading...",
                     style = MaterialTheme.typography.bodySmall,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(recipe.strYoutube))
-                        context.startActivity(intent)
-                    }
-                )
-                Spacer(modifier = Modifier.size(4.dp))
-                Text(
-                    text = recipe.strSource,
-                    style = MaterialTheme.typography.bodySmall,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(recipe.strSource))
-                        context.startActivity(intent)
-                    }
+                    modifier = Modifier.padding(16.dp)
                 )
             }
 
+            RecipeDetailsUiState.Error -> {
+                Text(
+                    text = "Error: Something went wrong!",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
         }
     }
 }
 
 /**
  * This is a Composable function that displays a grid of ingredients for a given recipe.
- * It takes a Recipe object as a parameter and displays its ingredients in a grid format.
+ * It takes a RecipeDetails object as a parameter and displays its ingredients in a grid format.
  *
- * @param recipe The Recipe object whose ingredients are to be displayed.
+ * @param recipe The RecipeDetails object whose ingredients are to be displayed.
  */
 @Composable
 fun IngredientsGrid(
-    recipe: Recipe,
+    recipe: RecipeDetails,
 ) {
     val ingredients = listOf(
         recipe.strIngredient1 to recipe.strMeasure1,
@@ -248,6 +279,7 @@ fun IngredientCard(
             text = ingredient,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
         )
     }
 }
