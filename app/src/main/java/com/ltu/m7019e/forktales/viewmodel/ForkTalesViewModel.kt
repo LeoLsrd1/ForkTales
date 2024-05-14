@@ -55,6 +55,24 @@ sealed interface RecipeDetailsUiState {
 }
 
 /**
+ * Sealed interface representing the different states of the recipe search UI.
+ */
+sealed interface SearchUiState {
+    data object Empty : SearchUiState
+
+    data object Loading : SearchUiState
+
+    /**
+     * Represents the success state of the recipe search UI.
+     *
+     * @property recipes The recipe details fetched successfully.
+     */
+    data class Success(val recipes: List<RecipeDetails>) : SearchUiState
+
+    data object Error : SearchUiState
+}
+
+/**
  * ViewModel for the ForkTales application.
  *
  * @property recipesRepository The repository for fetching recipes.
@@ -68,9 +86,12 @@ class ForkTalesViewModel(
 ): ViewModel() {
     var recipeListUiState: RecipeListUiState by mutableStateOf(RecipeListUiState.Loading)
     var recipeDetailsUiState: RecipeDetailsUiState by mutableStateOf(RecipeDetailsUiState.Loading)
+    var searchUiState: SearchUiState by mutableStateOf(SearchUiState.Empty)
 
     var selectedRecipeName: String = ""
     var categories: MutableStateFlow<List<Category>> = MutableStateFlow(emptyList())
+
+    val searchValue = mutableStateOf("")
 
     init {
         getCategoryList()
@@ -131,6 +152,14 @@ class ForkTalesViewModel(
     }
 
     /**
+     * Put the recipe details in the UI state.
+     */
+    fun getRecipeDetailsByObject(recipeDetails: RecipeDetails) {
+        selectedRecipeName = recipeDetails.strMeal
+        recipeDetailsUiState = RecipeDetailsUiState.Success(recipeDetails)
+    }
+
+    /**
      * Fetches the list of categories.
      */
     fun getCategoryList() {
@@ -141,6 +170,30 @@ class ForkTalesViewModel(
                 Log.e("ForkTalesViewModel", e.toString())
             } catch (e: HttpException) {
                 Log.e("ForkTalesViewModel", e.toString())
+            }
+        }
+    }
+
+    /**
+     * Updates the search value.
+     */
+    fun onSearchValueChange(newValue: String) {
+        searchValue.value = newValue
+    }
+
+    /**
+     * Fetches recipes by the search value.
+     */
+    fun getRecipesBySearchValue() {
+        searchUiState = SearchUiState.Loading
+        viewModelScope.launch {
+            searchUiState = try {
+                val recipes = recipesDetailsRepository.searchRecipes(searchValue.value)
+                SearchUiState.Success(recipes)
+            } catch (e: IOException) {
+                SearchUiState.Error
+            } catch (e: HttpException) {
+                SearchUiState.Error
             }
         }
     }

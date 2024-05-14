@@ -32,8 +32,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ltu.m7019e.forktales.ui.screens.FavoritesScreen
 import com.ltu.m7019e.forktales.ui.screens.HomeScreen
-import com.ltu.m7019e.forktales.ui.screens.ProfileScreen
 import com.ltu.m7019e.forktales.ui.screens.RecipeDetailScreen
+import com.ltu.m7019e.forktales.ui.screens.SearchGridScreen
 import com.ltu.m7019e.forktales.viewmodel.ForkTalesViewModel
 
 /**
@@ -113,7 +113,13 @@ fun ForkTalesApp(
                     }
                 )
             }
-            composable(ForkTalesNavScreen.Search.route) { ProfileScreen() }
+            composable(ForkTalesNavScreen.Search.route) { SearchGridScreen(
+                viewModel = forkTalesViewModel,
+                onRecipeListItemClicked = {
+                    forkTalesViewModel.getRecipeDetailsByObject(it)
+                    navController.navigate(ForkTalesNavScreen.RecipeDetail.route)
+                }
+            ) }
             composable(ForkTalesNavScreen.Favorites.route) { FavoritesScreen() }
             composable(ForkTalesNavScreen.RecipeDetail.route) {
                 RecipeDetailScreen(

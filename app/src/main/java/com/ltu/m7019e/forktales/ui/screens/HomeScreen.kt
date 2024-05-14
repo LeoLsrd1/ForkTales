@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -128,8 +129,7 @@ fun RecipeCard(
     onRecipeListItemClicked: (Recipe) -> Unit
 ) {
     Card(
-        modifier = Modifier
-            .size(200.dp, 270.dp),
+        modifier = Modifier.width(200.dp),
         onClick = {
             onRecipeListItemClicked(recipe)
         }
@@ -152,6 +152,7 @@ fun RecipeCard(
                     style = MaterialTheme.typography.bodyLarge,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
+                    minLines = 2
                 )
             }
         }

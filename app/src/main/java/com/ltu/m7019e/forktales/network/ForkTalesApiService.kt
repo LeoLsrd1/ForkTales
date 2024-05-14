@@ -51,4 +51,16 @@ interface ForkTalesApiService {
      */
     @GET("categories.php")
     suspend fun getCategories(): CategoriesResponse
+
+    /**
+     * A suspend function that searches for recipes by a query from the network.
+     *
+     * @param query The query to search for.
+     * @return A RecipeDetailsResponse object.
+     */
+    @GET("search.php")
+    suspend fun searchRecipes(
+        @Query("s")
+        query: String
+    ): RecipeDetailsResponse
 }

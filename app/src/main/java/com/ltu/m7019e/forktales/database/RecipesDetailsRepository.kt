@@ -22,6 +22,14 @@ interface RecipesDetailsRepository {
      * @return A RecipeDetails object.
      */
     suspend fun getRandomRecipe(): RecipeDetails
+
+    /**
+     * A suspend function that searches for recipes by a query.
+     *
+     * @param query The query to search for.
+     * @return A list of RecipeDetails objects.
+     */
+    suspend fun searchRecipes(query: String): List<RecipeDetails>
 }
 
 /**
@@ -50,5 +58,15 @@ class NetworkRecipesDetailsRepository(
      */
     override suspend fun getRandomRecipe(): RecipeDetails {
         return apiService.getRandomRecipe().meals.first()
+    }
+
+    /**
+     * A suspend function that searches for recipes by a query from the network.
+     *
+     * @param query The query to search for.
+     * @return A list of RecipeDetails objects.
+     */
+    override suspend fun searchRecipes(query: String): List<RecipeDetails> {
+        return apiService.searchRecipes(query).meals
     }
 }
