@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -33,11 +34,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.lifecycle.LifecycleOwner
 import coil.compose.AsyncImage
 import com.ltu.m7019e.forktales.R
 import com.ltu.m7019e.forktales.model.RecipeDetails
 import com.ltu.m7019e.forktales.utils.Constants
 import com.ltu.m7019e.forktales.viewmodel.RecipeDetailsUiState
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
+import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 /**
  * This is a Composable function that displays the details of a selected recipe.
@@ -58,7 +64,7 @@ fun RecipeDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    Column {
+    Column(modifier = modifier) {
         CenterAlignedTopAppBar(
             title = {
                 Text(
@@ -134,18 +140,19 @@ fun RecipeDetailScreen(
                                 modifier = Modifier.padding(8.dp),
                             )
                         }
-                        Spacer(modifier = Modifier.size(16.dp))
-                        Text(
-                            text = recipe.strYoutube,
-                            style = MaterialTheme.typography.bodySmall,
-                            textDecoration = TextDecoration.Underline,
-                            modifier = Modifier.clickable {
-                                val intent =
-                                    Intent(Intent.ACTION_VIEW, Uri.parse(recipe.strYoutube))
-                                context.startActivity(intent)
-                            }
-                        )
-                        Spacer(modifier = Modifier.size(4.dp))
+                    }
+
+                    item {
+                        if(recipe.strYoutube != "") {
+                            YoutubePlayer(
+                                videoId = recipe.strYoutube.split("v=")[1],
+                                lifecycleOwner = context as LifecycleOwner,
+                                modifier = Modifier.padding(horizontal = 16.dp)
+                            )
+                        }
+                    }
+
+                    item {
                         Text(
                             text = recipe.strSource,
                             style = MaterialTheme.typography.bodySmall,
@@ -282,4 +289,32 @@ fun IngredientCard(
             textAlign = TextAlign.Center
         )
     }
+}
+
+/**
+ * This is a Composable function that displays a YouTube player.
+ * It takes a videoId and a lifecycleOwner as parameters and displays the YouTube player.
+ *
+ * @param videoId The videoId of the YouTube video to be displayed.
+ * @param lifecycleOwner The lifecycleOwner of the Composable.
+ * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
+ */
+@Composable
+fun YoutubePlayer(
+    videoId: String,
+    lifecycleOwner: LifecycleOwner,
+    modifier: Modifier = Modifier
+) {
+    AndroidView(
+        modifier = modifier.clip(MaterialTheme.shapes.medium),
+        factory = {context ->
+        YouTubePlayerView(context = context).apply {
+            lifecycleOwner.lifecycle.addObserver(this)
+            addYouTubePlayerListener(object : AbstractYouTubePlayerListener(){
+                override fun onReady(youTubePlayer: YouTubePlayer) {
+                    youTubePlayer.cueVideo(videoId, 0f)
+                }
+            })
+        }
+    })
 }
