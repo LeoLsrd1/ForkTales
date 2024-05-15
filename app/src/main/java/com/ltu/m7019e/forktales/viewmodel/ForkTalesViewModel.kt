@@ -13,6 +13,7 @@ import com.ltu.m7019e.forktales.ForkTalesApplication
 import com.ltu.m7019e.forktales.database.CategoriesRepository
 import com.ltu.m7019e.forktales.database.RecipesDetailsRepository
 import com.ltu.m7019e.forktales.database.RecipesRepository
+import com.ltu.m7019e.forktales.database.SavedRecipesRepository
 import com.ltu.m7019e.forktales.model.Category
 import com.ltu.m7019e.forktales.model.Recipe
 import com.ltu.m7019e.forktales.model.RecipeDetails
@@ -78,11 +79,13 @@ sealed interface SearchUiState {
  * @property recipesRepository The repository for fetching recipes.
  * @property recipesDetailsRepository The repository for fetching recipe details.
  * @property categoriesRepository The repository for fetching categories.
+ * @property savedRecipesRepository The repository for saving recipes in the database.
  */
 class ForkTalesViewModel(
     private val recipesRepository: RecipesRepository,
     private val recipesDetailsRepository: RecipesDetailsRepository,
-    private val categoriesRepository: CategoriesRepository
+    private val categoriesRepository: CategoriesRepository,
+    private val savedRecipesRepository: SavedRecipesRepository
 ): ViewModel() {
     var recipeListUiState: RecipeListUiState by mutableStateOf(RecipeListUiState.Loading)
     var recipeDetailsUiState: RecipeDetailsUiState by mutableStateOf(RecipeDetailsUiState.Loading)
@@ -208,10 +211,12 @@ class ForkTalesViewModel(
                 val recipesRepository = application.container.recipesRepository
                 val recipesRepositoryDetails = application.container.recipesDetailsRepository
                 val categoriesRepository = application.container.categoriesRepository
+                val savedRecipesRepository = application.container.savedRecipesRepository
                 ForkTalesViewModel(
                     recipesRepository = recipesRepository,
                     recipesDetailsRepository = recipesRepositoryDetails,
-                    categoriesRepository = categoriesRepository
+                    categoriesRepository = categoriesRepository,
+                    savedRecipesRepository = savedRecipesRepository
                 )
             }
         }

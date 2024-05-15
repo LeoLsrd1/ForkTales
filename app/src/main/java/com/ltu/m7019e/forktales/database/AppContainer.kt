@@ -16,6 +16,7 @@ interface AppContainer {
     val recipesRepository: RecipesRepository
     val recipesDetailsRepository: RecipesDetailsRepository
     val categoriesRepository: CategoriesRepository
+    val savedRecipesRepository: SavedRecipesRepository
 }
 
 /**
@@ -87,5 +88,12 @@ class DefaultAppContainer(private val context: Context) : AppContainer {
      */
     override val categoriesRepository: CategoriesRepository by lazy {
         NetworkCategoriesRepository(retrofitService)
+    }
+
+    /**
+     * A lazy property that provides the SavedRecipesRepository.
+     */
+    override val savedRecipesRepository: SavedRecipesRepository by lazy {
+        FavoriteRecipesRepository(RecipeDatabase.getDatabase(context).recipeDao())
     }
 }
