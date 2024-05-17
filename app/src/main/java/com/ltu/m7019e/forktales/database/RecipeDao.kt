@@ -4,38 +4,38 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.ltu.m7019e.forktales.model.Recipe
+import com.ltu.m7019e.forktales.model.RecipeDetails
 
 /**
- * An interface that provides insert, delete, and retrieve [Recipe] from a given data source.
+ * An interface that provides insert, delete, and retrieve [RecipeDetails] from a given data source.
  */
 @Dao
 interface RecipeDao {
     /**
      * Fetches all favorite recipes from the data source.
      *
-     * @return A list of Recipe objects representing all favorite recipes.
+     * @return A list of RecipeDetails objects representing all favorite recipes.
      */
     @Query("SELECT * FROM favorite_recipes")
-    suspend fun getFavoriteRecipes(): List<Recipe>
+    suspend fun getFavoriteRecipes(): List<RecipeDetails>
 
     /**
      * Inserts a new favorite recipe into the data source.
      * If the recipe already exists, the insertion is ignored.
      *
-     * @param recipe The Recipe object to be inserted.
+     * @param recipeDetails The RecipeDetails object to be inserted.
      */
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertFavoriteRecipe(recipe: Recipe)
+    suspend fun insertFavoriteRecipe(recipeDetails: RecipeDetails)
 
     /**
      * Fetches a favorite recipe by its id.
      *
      * @param idMeal The id of the recipe to fetch.
-     * @return The Recipe object corresponding to the given id.
+     * @return The RecipeDetails object corresponding to the given id.
      */
     @Query("SELECT * FROM favorite_recipes where idMeal = :idMeal")
-    suspend fun getRecipe(idMeal: String): Recipe
+    suspend fun getRecipe(idMeal: String): RecipeDetails
 
     /**
      * Deletes a favorite recipe from the data source by its it.

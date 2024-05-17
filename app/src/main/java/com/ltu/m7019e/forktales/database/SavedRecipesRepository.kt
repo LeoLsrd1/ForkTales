@@ -1,38 +1,38 @@
 package com.ltu.m7019e.forktales.database
 
-import com.ltu.m7019e.forktales.model.Recipe
+import com.ltu.m7019e.forktales.model.RecipeDetails
 
 /**
- * An interface that provides insert, delete, and retrieve [Recipe] from a given data source.
+ * An interface that provides insert, delete, and retrieve [RecipeDetails] from a given data source.
  */
 interface SavedRecipesRepository {
     /**
      * A suspend function that fetches the recipes from the data source.
      *
-     * @return A list of Recipe objects.
+     * @return A list of RecipeDetails objects.
      */
-    suspend fun getSavedRecipes(): List<Recipe>
+    suspend fun getSavedRecipes(): List<RecipeDetails>
 
     /**
      * A suspend function that inserts a recipe in the data source.
-     * @param recipe The recipe to insert.
+     * @param recipeDetails The recipe to insert.
      */
-    suspend fun insertRecipe(recipe: Recipe)
+    suspend fun insertRecipe(recipeDetails: RecipeDetails)
 
     /**
      *
      * A suspend function that fetches a recipe by its id from the data source.
      * @param idMeal The id of the recipe.
-     * @return A Recipe object.
+     * @return A RecipeDetails object.
      */
-    suspend fun getRecipe(idMeal: String): Recipe
+    suspend fun getRecipe(idMeal: String): RecipeDetails
 
     /**
      *
      * A suspend function that deletes a saved recipe from the data source.
-     * @param recipe The Recipe object.
+     * @param recipeDetails The RecipeDetails object.
      */
-    suspend fun deleteRecipe(recipe: Recipe)
+    suspend fun deleteRecipe(recipeDetails: RecipeDetails)
 }
 
 /**
@@ -45,36 +45,36 @@ class FavoriteRecipesRepository(private val recipeDao: RecipeDao) : SavedRecipes
     /**
      * A suspend function that fetches the recipes from the data source.
      *
-     * @return A list of Recipe objects.
+     * @return A list of RecipeDetails objects.
      */
-    override suspend fun getSavedRecipes(): List<Recipe> {
+    override suspend fun getSavedRecipes(): List<RecipeDetails> {
         return recipeDao.getFavoriteRecipes()
     }
 
     /**
      * A suspend function that inserts a recipe in the data source.
-     * @param recipe The recipe to insert.
+     * @param recipeDetails The recipe to insert.
      */
-    override suspend fun insertRecipe(recipe: Recipe) {
-        recipeDao.insertFavoriteRecipe(recipe)
+    override suspend fun insertRecipe(recipeDetails: RecipeDetails) {
+        recipeDao.insertFavoriteRecipe(recipeDetails)
     }
 
     /**
      *
      * A suspend function that fetches a recipe by its id from the data source.
      * @param idMeal The id of the recipe.
-     * @return A Recipe object.
+     * @return A RecipeDetails object.
      */
-    override suspend fun getRecipe(idMeal: String): Recipe {
+    override suspend fun getRecipe(idMeal: String): RecipeDetails {
         return recipeDao.getRecipe(idMeal)
     }
 
     /**
      *
      * A suspend function that deletes a saved recipe from the data source.
-     * @param recipe The Recipe object.
+     * @param recipeDetails The RecipeDetails object.
      */
-    override suspend fun deleteRecipe(recipe: Recipe) {
-        recipeDao.deleteFavoriteRecipe(recipe.idMeal)
+    override suspend fun deleteRecipe(recipeDetails: RecipeDetails) {
+        recipeDao.deleteFavoriteRecipe(recipeDetails.idMeal)
     }
 }

@@ -18,6 +18,8 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,6 +42,7 @@ import coil.compose.AsyncImage
 import com.ltu.m7019e.forktales.R
 import com.ltu.m7019e.forktales.model.RecipeDetails
 import com.ltu.m7019e.forktales.utils.Constants
+import com.ltu.m7019e.forktales.viewmodel.ForkTalesViewModel
 import com.ltu.m7019e.forktales.viewmodel.RecipeDetailsUiState
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
@@ -50,7 +53,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
  * It uses the ForkTalesViewModel to get the selected recipe and displays its details.
  * It also provides a navigation up function to go back to the previous screen.
  *
- * @param recipeDetailsUiState The UI state of the recipe details.
+ * @param forkTalesViewModel The View Model.
  * @param recipeName The name of the recipe.
  * @param navigateUp A function that navigates up in the navigation stack.
  * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
@@ -58,7 +61,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
-    recipeDetailsUiState: RecipeDetailsUiState,
+    forkTalesViewModel: ForkTalesViewModel,
     recipeName: String,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier,
@@ -82,9 +85,9 @@ fun RecipeDetailScreen(
                 }
             }
         )
-        when (recipeDetailsUiState) {
+        when (val recipeDetailsUiState = forkTalesViewModel.recipeDetailsUiState) {
             is RecipeDetailsUiState.Success -> {
-                val recipe = recipeDetailsUiState.recipe
+                val recipeDetails = recipeDetailsUiState.recipeDetails
                 LazyColumn(
                     contentPadding = PaddingValues(bottom = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -93,25 +96,50 @@ fun RecipeDetailScreen(
                     item {
                         Box {
                             AsyncImage(
-                                model = recipe.strMealThumb,
-                                contentDescription = recipe.strMeal,
+                                model = recipeDetails.strMealThumb,
+                                contentDescription = recipeDetails.strMeal,
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .aspectRatio(4 / 3f)
                             )
                         }
-                        if (recipe.strArea != "" && recipe.strTags != "") {
-                            Text(
-                                text = "${recipe.strArea} | ${recipe.strTags}",
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
-                        } else {
-                            Text(
-                                text = "${recipe.strArea}${recipe.strTags}",
-                                style = MaterialTheme.typography.bodyMedium,
-                            )
+                        Row {
+                            if (recipeDetails.strArea != "" && recipeDetails.strTags != "") {
+                                Text(
+                                    text = "${recipeDetails.strArea} | ${recipeDetails.strTags}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = "${recipeDetails.strArea}${recipeDetails.strTags}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    modifier = Modifier.padding(16.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.weight(1f))
+                            if (!recipeDetailsUiState.isFavorite) {
+                                IconButton(
+                                    onClick = { forkTalesViewModel.saveRecipe(recipeDetails) }
+                                ) {
+                                    Icon(
+                                        Icons.Filled.FavoriteBorder,
+                                        contentDescription = null
+                                    )
+                                }
+                            } else {
+                                IconButton(
+                                    onClick = { forkTalesViewModel.deleteRecipe(recipeDetails) }
+                                ) {
+                                    androidx.compose.material3.Icon(
+                                        Icons.Filled.Favorite,
+                                        contentDescription = null
+                                    )
+                                }
+                            }
                         }
+                        
                     }
 
                     item {
@@ -120,7 +148,7 @@ fun RecipeDetailScreen(
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Spacer(modifier = Modifier.size(16.dp))
-                        IngredientsGrid(recipe = recipe)
+                        IngredientsGrid(recipe = recipeDetails)
                     }
 
                     item {
@@ -135,7 +163,7 @@ fun RecipeDetailScreen(
                                 .padding(horizontal = 16.dp)
                         ) {
                             Text(
-                                text = recipe.strInstructions,
+                                text = recipeDetails.strInstructions,
                                 style = MaterialTheme.typography.bodyLarge,
                                 modifier = Modifier.padding(8.dp),
                             )
@@ -143,9 +171,9 @@ fun RecipeDetailScreen(
                     }
 
                     item {
-                        if(recipe.strYoutube != "") {
+                        if(recipeDetails.strYoutube != "") {
                             YoutubePlayer(
-                                videoId = recipe.strYoutube.split("v=")[1],
+                                videoId = recipeDetails.strYoutube.split("v=")[1],
                                 lifecycleOwner = context as LifecycleOwner,
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
@@ -154,11 +182,11 @@ fun RecipeDetailScreen(
 
                     item {
                         Text(
-                            text = recipe.strSource,
+                            text = recipeDetails.strSource,
                             style = MaterialTheme.typography.bodySmall,
                             textDecoration = TextDecoration.Underline,
                             modifier = Modifier.clickable {
-                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(recipe.strSource))
+                                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(recipeDetails.strSource))
                                 context.startActivity(intent)
                             }
                         )

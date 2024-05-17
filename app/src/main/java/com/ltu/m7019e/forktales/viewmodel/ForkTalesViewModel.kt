@@ -40,6 +40,23 @@ sealed interface RecipeListUiState {
 }
 
 /**
+ * Sealed interface representing the different states of the favorite recipes list UI.
+ */
+sealed interface FavoriteRecipesListUiState {
+
+    data object Loading : FavoriteRecipesListUiState
+
+    /**
+     * Represents the success state of the favorite recipes list UI.
+     *
+     * @property recipes The list of recipes fetched successfully.
+     */
+    data class Success(val recipes: List<Recipe>) : FavoriteRecipesListUiState
+
+    data object Error : FavoriteRecipesListUiState
+}
+
+/**
  * Sealed interface representing the different states of the recipe details UI.
  */
 sealed interface RecipeDetailsUiState {
@@ -49,9 +66,11 @@ sealed interface RecipeDetailsUiState {
     /**
      * Represents the success state of the recipe details UI.
      *
-     * @property recipe The recipe details fetched successfully.
+     * @property recipeDetails The recipe details fetched successfully.
      */
-    data class Success(val recipe: RecipeDetails) : RecipeDetailsUiState
+    data class Success(
+        val recipeDetails: RecipeDetails,
+        val isFavorite: Boolean) : RecipeDetailsUiState
     data object Error : RecipeDetailsUiState
 }
 
@@ -89,6 +108,7 @@ class ForkTalesViewModel(
 ): ViewModel() {
     var recipeListUiState: RecipeListUiState by mutableStateOf(RecipeListUiState.Loading)
     var recipeDetailsUiState: RecipeDetailsUiState by mutableStateOf(RecipeDetailsUiState.Loading)
+    var favoriteRecipesListUiState: FavoriteRecipesListUiState by mutableStateOf(FavoriteRecipesListUiState.Loading)
     var searchUiState: SearchUiState by mutableStateOf(SearchUiState.Empty)
 
     var selectedRecipeName: String = ""
@@ -99,6 +119,7 @@ class ForkTalesViewModel(
     init {
         getCategoryList()
         observeCategoriesChanges()
+        updateFavoriteRecipes()
     }
 
     /**
@@ -144,8 +165,10 @@ class ForkTalesViewModel(
         recipeDetailsUiState = RecipeDetailsUiState.Loading
         viewModelScope.launch {
             recipeDetailsUiState = try {
-                val recipe = recipesDetailsRepository.getRecipeDetailsById(id)
-                RecipeDetailsUiState.Success(recipe)
+                val recipeDetails = recipesDetailsRepository.getRecipeDetailsById(id)
+                RecipeDetailsUiState.Success(
+                    recipeDetails,
+                    savedRecipesRepository.getRecipe(id) != null)
             } catch (e: IOException) {
                 RecipeDetailsUiState.Error
             } catch (e: HttpException) {
@@ -159,7 +182,11 @@ class ForkTalesViewModel(
      */
     fun getRecipeDetailsByObject(recipeDetails: RecipeDetails) {
         selectedRecipeName = recipeDetails.strMeal
-        recipeDetailsUiState = RecipeDetailsUiState.Success(recipeDetails)
+        viewModelScope.launch {
+            recipeDetailsUiState = RecipeDetailsUiState
+                .Success(recipeDetails,
+                    savedRecipesRepository.getRecipe(recipeDetails.idMeal) != null)
+        }
     }
 
     /**
@@ -200,6 +227,83 @@ class ForkTalesViewModel(
             }
         }
     }
+
+    /**
+     * Saves a RecipeDetails in the favorite recipes database.
+     *
+     * @param recipeDetails The RecipeDetails to save.
+     */
+    fun saveRecipe(recipeDetails: RecipeDetails) {
+        viewModelScope.launch {
+            savedRecipesRepository.insertRecipe(recipeDetails)
+            updateFavoriteRecipes()
+            recipeDetailsUiState = try {
+                RecipeDetailsUiState.Success(
+                    recipesDetailsRepository.getRecipeDetailsById(recipeDetails.idMeal),
+                    true
+                )
+            } catch(e : IOException) {
+                RecipeDetailsUiState.Error
+            } catch(e : HttpException) {
+                RecipeDetailsUiState.Error
+            }
+        }
+    }
+
+    /**
+     * Deletes a RecipeDetails from the favorite recipes database.
+     *
+     * @param recipeDetails The RecipeDetails to delete.
+     */
+    fun deleteRecipe(recipeDetails: RecipeDetails) {
+        viewModelScope.launch {
+            savedRecipesRepository.deleteRecipe(recipeDetails)
+            updateFavoriteRecipes()
+            recipeDetailsUiState = try {
+                RecipeDetailsUiState.Success(
+                    recipesDetailsRepository.getRecipeDetailsById(recipeDetails.idMeal),
+                    false
+                )
+            } catch(e : IOException) {
+                RecipeDetailsUiState.Error
+            } catch(e : HttpException) {
+                RecipeDetailsUiState.Error
+            }
+        }
+    }
+
+    /**
+     * Update the favorite recipes UI that displays the favorite recipes.
+     */
+    private fun updateFavoriteRecipes() {
+        favoriteRecipesListUiState = FavoriteRecipesListUiState.Loading
+        viewModelScope.launch {
+            favoriteRecipesListUiState = try {
+                val recipes: MutableList<Recipe> = mutableListOf()
+                savedRecipesRepository.getSavedRecipes().forEach {
+                    recipes.add(getRecipeFromRecipeDetails(it))
+                }
+                FavoriteRecipesListUiState.Success(recipes)
+            } catch(e : IOException) {
+                FavoriteRecipesListUiState.Error
+            } catch(e : HttpException) {
+                FavoriteRecipesListUiState.Error
+            }
+        }
+    }
+
+    /**
+     *  Get a recipe from a recipe details.
+     */
+    private fun getRecipeFromRecipeDetails(recipeDetails: RecipeDetails): Recipe {
+        return Recipe(
+            idMeal = recipeDetails.idMeal,
+            strMeal = recipeDetails.strMeal,
+            strMealThumb = recipeDetails.strMealThumb,
+            strCategory = recipeDetails.strCategory
+        )
+    }
+
 
     /**
      * Factory for creating instances of the ForkTalesViewModel.

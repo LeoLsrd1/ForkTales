@@ -120,10 +120,20 @@ fun ForkTalesApp(
                     navController.navigate(ForkTalesNavScreen.RecipeDetail.route)
                 }
             ) }
-            composable(ForkTalesNavScreen.Favorites.route) { FavoritesScreen() }
+            composable(ForkTalesNavScreen.Favorites.route) {
+                FavoritesScreen(
+                    favoriteRecipesListUiState = forkTalesViewModel.favoriteRecipesListUiState,
+                    categoriesFlow = forkTalesViewModel.categories,
+                    onRecipeListItemClicked = {
+                        forkTalesViewModel.selectedRecipeName = it.strMeal
+                        forkTalesViewModel.getRecipeDetailsById(it.idMeal)
+                        navController.navigate(ForkTalesNavScreen.RecipeDetail.route)
+                    }
+                )
+            }
             composable(ForkTalesNavScreen.RecipeDetail.route) {
                 RecipeDetailScreen(
-                    recipeDetailsUiState = forkTalesViewModel.recipeDetailsUiState,
+                    forkTalesViewModel = forkTalesViewModel,
                     recipeName = forkTalesViewModel.selectedRecipeName,
                     navigateUp = { navController.navigateUp() }
                 )

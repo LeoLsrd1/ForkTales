@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.ltu.m7019e.forktales.model.Recipe
 import coil.compose.AsyncImage
 import com.ltu.m7019e.forktales.model.Category
+import com.ltu.m7019e.forktales.model.Recipe
 import com.ltu.m7019e.forktales.viewmodel.RecipeListUiState
 import kotlinx.coroutines.flow.Flow
 
@@ -147,13 +148,16 @@ fun RecipeCard(
                 modifier = Modifier.padding(8.dp)
             ) {
                 Spacer(modifier = Modifier.size(4.dp))
-                Text(
-                    text = recipe.strMeal,
-                    style = MaterialTheme.typography.bodyLarge,
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2,
-                    minLines = 2
-                )
+                Row {
+                    Text(
+                        text = recipe.strMeal,
+                        style = MaterialTheme.typography.bodyLarge,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 2,
+                        minLines = 2
+                    )
+
+                }
             }
         }
     }

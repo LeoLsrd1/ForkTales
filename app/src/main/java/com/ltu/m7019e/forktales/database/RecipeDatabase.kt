@@ -4,12 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.ltu.m7019e.forktales.model.Recipe
+import com.ltu.m7019e.forktales.model.RecipeDetails
 
 /**
  * The Room database for storing Recipe entities.
  */
-@Database(entities = [Recipe::class], version = 1, exportSchema = false)
+@Database(entities = [RecipeDetails::class], version = 2, exportSchema = false)
 abstract class RecipeDatabase : RoomDatabase() {
 
     /**
