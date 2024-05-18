@@ -25,6 +25,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +57,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
  * @param forkTalesViewModel The View Model.
  * @param recipeName The name of the recipe.
  * @param navigateUp A function that navigates up in the navigation stack.
+ * @param windowSize The size of the window.
  * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,6 +66,7 @@ fun RecipeDetailScreen(
     forkTalesViewModel: ForkTalesViewModel,
     recipeName: String,
     navigateUp: () -> Unit,
+    windowSize: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -99,12 +102,21 @@ fun RecipeDetailScreen(
                                 model = recipeDetails.strMealThumb,
                                 contentDescription = recipeDetails.strMeal,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .aspectRatio(4 / 3f)
+                                modifier =
+                                if(windowSize != WindowWidthSizeClass.Expanded) {
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .aspectRatio(4 / 3f)
+                                } else {
+                                    Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .aspectRatio(4 / 3f)
+                                }
                             )
                         }
-                        Row {
+                        Row(
+                            horizontalArrangement = Arrangement.Center
+                        ) {
                             if (recipeDetails.strArea != "" && recipeDetails.strTags != "") {
                                 Text(
                                     text = "${recipeDetails.strArea} | ${recipeDetails.strTags}",
@@ -118,7 +130,6 @@ fun RecipeDetailScreen(
                                     modifier = Modifier.padding(16.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.weight(1f))
                             if (!recipeDetailsUiState.isFavorite) {
                                 IconButton(
                                     onClick = { forkTalesViewModel.saveRecipe(recipeDetails) }
@@ -148,7 +159,8 @@ fun RecipeDetailScreen(
                             style = MaterialTheme.typography.headlineSmall
                         )
                         Spacer(modifier = Modifier.size(16.dp))
-                        IngredientsGrid(recipe = recipeDetails)
+                        val nbChunks = if(windowSize != WindowWidthSizeClass.Expanded) 3 else 6
+                        IngredientsGrid(recipe = recipeDetails, nbChunks = nbChunks)
                     }
 
                     item {
@@ -182,7 +194,7 @@ fun RecipeDetailScreen(
 
                     item {
                         Text(
-                            text = recipeDetails.strSource,
+                            text = stringResource(R.string.youtube),
                             style = MaterialTheme.typography.bodySmall,
                             textDecoration = TextDecoration.Underline,
                             modifier = Modifier.clickable {
@@ -218,10 +230,12 @@ fun RecipeDetailScreen(
  * It takes a RecipeDetails object as a parameter and displays its ingredients in a grid format.
  *
  * @param recipe The RecipeDetails object whose ingredients are to be displayed.
+ * @param nbChunks The number of ingredients to display on one row.
  */
 @Composable
 fun IngredientsGrid(
     recipe: RecipeDetails,
+    nbChunks: Int,
 ) {
     val ingredients = listOf(
         recipe.strIngredient1 to recipe.strMeasure1,
@@ -246,7 +260,7 @@ fun IngredientsGrid(
         recipe.strIngredient20 to recipe.strMeasure20
     )
 
-    val gridRows = ingredients.chunked(3)
+    val gridRows = ingredients.chunked(nbChunks)
     gridRows.forEach { row ->
         val maxWidthFraction = row.size / 3f
         Row(

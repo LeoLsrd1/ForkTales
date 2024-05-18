@@ -12,11 +12,16 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,14 +45,16 @@ import com.ltu.m7019e.forktales.viewmodel.SearchUiState
  * It displays a grid of recipes that match the search query.
  *
  * @param viewModel The ViewModel that provides the data for the screen.
- * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
  * @param onRecipeListItemClicked A function that is invoked when a recipe list item is clicked.
+ * @param windowSize The size of the window.
+ * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
  */
 @Composable
 fun SearchGridScreen(
     viewModel: ForkTalesViewModel,
+    onRecipeListItemClicked: (RecipeDetails) -> Unit,
+    windowSize: WindowWidthSizeClass,
     modifier: Modifier = Modifier,
-    onRecipeListItemClicked: (RecipeDetails) -> Unit
 ) {
     val searchValue by viewModel.searchValue
     val searchUiState = viewModel.searchUiState
@@ -61,6 +68,15 @@ fun SearchGridScreen(
             onValueChange = { viewModel.onSearchValueChange(it) },
             label = { Text(stringResource(id = R.string.search)) },
             singleLine = true,
+            trailingIcon = {
+                if (searchValue.isNotEmpty()) {
+                    IconButton(onClick = {
+                        viewModel.onSearchValueChange("")
+                    }) {
+                        Icon(imageVector = Icons.Default.Clear, contentDescription = null)
+                    }
+                }
+            },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
             keyboardActions = KeyboardActions(onSearch = {
                 viewModel.getRecipesBySearchValue()
@@ -73,8 +89,9 @@ fun SearchGridScreen(
         )
         when (searchUiState) {
             is SearchUiState.Success -> {
+                val nbColumns = if(windowSize != WindowWidthSizeClass.Expanded) 2 else 4
                 RecipesGrid(
-                    columnNumber = 2,
+                    columnNumber = nbColumns,
                     recipes = searchUiState.recipes,
                     onRecipeListItemClicked = onRecipeListItemClicked,
                     modifier = Modifier.padding(horizontal = 16.dp)
