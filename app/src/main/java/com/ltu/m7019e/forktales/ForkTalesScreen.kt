@@ -83,26 +83,26 @@ fun ForkTalesApp(
         ForkTalesNavScreen.Search
     )
 
-        Scaffold(
-            backgroundColor = MaterialTheme.colorScheme.background,
-            contentColor = MaterialTheme.colorScheme.onBackground,
-            bottomBar =
-                { if (windowSize != WindowWidthSizeClass.Expanded)
-                    BottomAppBar(navController = navController, items = items)
-                }
-        ) { innerPadding ->
-            Row {
-                if (windowSize == WindowWidthSizeClass.Expanded) {
-                    SideAppBar(navController = navController, items = items)
-                }
-                NavGraphScheme(
-                    forkTalesViewModel = forkTalesViewModel,
-                    navController = navController,
-                    innerPadding = innerPadding,
-                    windowSize = windowSize
-                )
+    Scaffold(
+        backgroundColor = MaterialTheme.colorScheme.background,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+        bottomBar =
+            { if (windowSize != WindowWidthSizeClass.Expanded)
+                BottomAppBar(navController = navController, items = items)
             }
+    ) { innerPadding ->
+        Row {
+            if (windowSize == WindowWidthSizeClass.Expanded) {
+                SideAppBar(navController = navController, items = items)
+            }
+            NavGraphScheme(
+                forkTalesViewModel = forkTalesViewModel,
+                navController = navController,
+                innerPadding = innerPadding,
+                windowSize = windowSize
+            )
         }
+    }
 }
 
 /**
@@ -138,7 +138,7 @@ fun SideAppBar(
                             launchSingleTop = true
                             restoreState = true
                         }
-                }
+                    }
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -146,7 +146,7 @@ fun SideAppBar(
                 ) {
                     Icon(
                         imageVector = if (isSelected) screen.iconFilled else screen.iconOutlined,
-                        contentDescription = null,
+                        contentDescription = stringResource(id = screen.resourceId),
                         tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
                     )
                     Spacer(modifier = Modifier.width(8.dp))
@@ -184,7 +184,7 @@ fun BottomAppBar(
                 icon = {
                     Icon(
                         if (isSelected) screen.iconFilled else screen.iconOutlined,
-                        contentDescription = null
+                        contentDescription = stringResource(id = screen.resourceId)
                     )
                 },
                 label = { Text(text = stringResource(id = screen.resourceId)) },

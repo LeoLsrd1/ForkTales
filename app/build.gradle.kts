@@ -89,6 +89,15 @@ dependencies {
     // Window Size
     implementation("androidx.compose.material3:material3-window-size-class")
 
+    // UI Tests
+    androidTestImplementation(libs.androidx.compose.bom.v20230501)
+    androidTestImplementation(libs.ui.test.junit4)
+    androidTestImplementation(libs.androidx.navigation.testing)
+    androidTestImplementation(libs.androidx.espresso.intents)
+    androidTestImplementation(libs.androidx.junit)
+
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

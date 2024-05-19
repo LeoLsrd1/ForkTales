@@ -7,6 +7,8 @@
     <string name="profile">Profile</string>
     <string name="ingredients">Ingredients</string>
     <string name="back">Back</string>
-    <string name="empty_favorites">No favorite recipes...</string>
+    <string name="empty_favorites">No favorite recipes…</string>
     <string name="youtube">Watch on YouTube</string>
+
+    <string name="one_recipe">One recipe</string>
 </resources>
