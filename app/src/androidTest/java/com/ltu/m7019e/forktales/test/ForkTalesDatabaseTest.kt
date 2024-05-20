@@ -53,11 +53,15 @@ class ForkTalesDatabaseTest {
 
         recipeDao.insertFavoriteRecipe(recipeDetails)
 
+        val favoritesBeforeDelete = recipeDao.getFavoriteRecipes()
+
+        assertTrue(favoritesBeforeDelete.isNotEmpty())
+
         recipeDao.deleteFavoriteRecipe(recipeDetails.idMeal)
 
-        val favorites = recipeDao.getFavoriteRecipes()
+        val favoritesAfterDelete = recipeDao.getFavoriteRecipes()
 
-        assertTrue(favorites.isEmpty())
+        assertTrue(favoritesAfterDelete.isEmpty())
     }
 
     @Test

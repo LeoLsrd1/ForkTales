@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -90,12 +91,23 @@ fun SearchGridScreen(
         when (searchUiState) {
             is SearchUiState.Success -> {
                 val nbColumns = if(windowSize != WindowWidthSizeClass.Expanded) 2 else 4
-                RecipesGrid(
-                    columnNumber = nbColumns,
-                    recipes = searchUiState.recipes,
-                    onRecipeListItemClicked = onRecipeListItemClicked,
-                    modifier = Modifier.padding(horizontal = 16.dp)
-                )
+
+                if(searchUiState.recipes.isEmpty()) {
+                    Box(contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "No results found!",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                } else {
+                    RecipesGrid(
+                        columnNumber = nbColumns,
+                        recipes = searchUiState.recipes,
+                        onRecipeListItemClicked = onRecipeListItemClicked,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                }
             }
             is SearchUiState.Empty -> {
             }

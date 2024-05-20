@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RecipesResponse(
-    val meals: List<Recipe>
+    val meals: List<Recipe> = listOf()
 )

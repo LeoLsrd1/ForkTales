@@ -96,6 +96,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.intents)
     androidTestImplementation(libs.androidx.junit)
 
+    // Database Tests
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.2")
 
     testImplementation(libs.junit)

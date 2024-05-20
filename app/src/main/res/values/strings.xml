@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">ForkTales</string>
+    <string name="login">Login</string>
     <string name="home">Home</string>
     <string name="recipe_detail">Recipe Detail</string>
     <string name="favorites">Favorites</string>
@@ -11,4 +12,8 @@
     <string name="youtube">Watch on YouTube</string>
 
     <string name="one_recipe">One recipe</string>
+
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="wrong">Wrong username or password!</string>
 </resources>

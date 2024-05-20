@@ -70,7 +70,9 @@ fun RecipeDetailScreen(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally) {
         CenterAlignedTopAppBar(
             title = {
                 Text(
@@ -301,7 +303,6 @@ fun IngredientCard(
     ingredient: String,
     measure: String
 ) {
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
