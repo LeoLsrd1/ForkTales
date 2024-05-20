@@ -23,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -88,21 +89,29 @@ fun LoginScreen(
             OutlinedTextField(
                 value = username,
                 onValueChange = { loginViewModel.onUsernameChange(it) },
+                singleLine = true,
                 label = {
-                    if(isWrong) {
+                    if (isWrong) {
                         Text(stringResource(R.string.wrong))
                     } else {
                         Text(stringResource(R.string.username))
                     }
                 },
-                colors = textFieldColors
+                colors = textFieldColors,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
+                )
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = { loginViewModel.onPasswordChange(it) },
+                singleLine = true,
                 label = {
-                    if(isWrong) {
+                    if (isWrong) {
                         Text(stringResource(R.string.wrong))
                     } else {
                         Text(stringResource(R.string.password))

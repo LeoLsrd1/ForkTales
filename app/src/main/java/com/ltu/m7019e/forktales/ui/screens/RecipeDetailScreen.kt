@@ -60,7 +60,6 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTube
  * @param windowSize The size of the window.
  * @param modifier A Modifier that can be used to adjust the layout or other visual properties of the Composable.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecipeDetailScreen(
     forkTalesViewModel: ForkTalesViewModel,
@@ -72,27 +71,33 @@ fun RecipeDetailScreen(
     val context = LocalContext.current
     Column(
         modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally) {
-        CenterAlignedTopAppBar(
-            title = {
-                Text(
-                    text = recipeName,
-                    style = MaterialTheme.typography.headlineMedium,
-                    textAlign = TextAlign.Center
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = { navigateUp() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                        contentDescription = stringResource(R.string.back)
-                    )
-                }
-            }
-        )
+        horizontalAlignment = Alignment.CenterHorizontally
+    )
+    {
         when (val recipeDetailsUiState = forkTalesViewModel.recipeDetailsUiState) {
             is RecipeDetailsUiState.Success -> {
                 val recipeDetails = recipeDetailsUiState.recipeDetails
+                TopAppBar(recipeName, navigateUp) {
+                    if (!recipeDetailsUiState.isFavorite) {
+                        IconButton(
+                            onClick = { forkTalesViewModel.saveRecipe(recipeDetails) }
+                        ) {
+                            Icon(
+                                Icons.Filled.FavoriteBorder,
+                                contentDescription = null
+                            )
+                        }
+                    } else {
+                        IconButton(
+                            onClick = { forkTalesViewModel.deleteRecipe(recipeDetails) }
+                        ) {
+                            androidx.compose.material3.Icon(
+                                Icons.Filled.Favorite,
+                                contentDescription = null
+                            )
+                        }
+                    }
+                }
                 LazyColumn(
                     contentPadding = PaddingValues(bottom = 16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -131,25 +136,6 @@ fun RecipeDetailScreen(
                                     style = MaterialTheme.typography.bodyMedium,
                                     modifier = Modifier.padding(16.dp)
                                 )
-                            }
-                            if (!recipeDetailsUiState.isFavorite) {
-                                IconButton(
-                                    onClick = { forkTalesViewModel.saveRecipe(recipeDetails) }
-                                ) {
-                                    Icon(
-                                        Icons.Filled.FavoriteBorder,
-                                        contentDescription = null
-                                    )
-                                }
-                            } else {
-                                IconButton(
-                                    onClick = { forkTalesViewModel.deleteRecipe(recipeDetails) }
-                                ) {
-                                    androidx.compose.material3.Icon(
-                                        Icons.Filled.Favorite,
-                                        contentDescription = null
-                                    )
-                                }
                             }
                         }
                         
@@ -209,6 +195,7 @@ fun RecipeDetailScreen(
             }
 
             RecipeDetailsUiState.Loading -> {
+                TopAppBar(recipeName, navigateUp) {}
                 Text(
                     text = "Loading...",
                     style = MaterialTheme.typography.bodySmall,
@@ -217,6 +204,7 @@ fun RecipeDetailScreen(
             }
 
             RecipeDetailsUiState.Error -> {
+                TopAppBar(recipeName, navigateUp) {}
                 Text(
                     text = "Error: Something went wrong!",
                     style = MaterialTheme.typography.bodySmall,
@@ -225,6 +213,43 @@ fun RecipeDetailScreen(
             }
         }
     }
+}
+
+/**
+ * This is a Composable function that displays a top app bar.
+ * It takes a recipe name, a navigate up function, and an actions Composable as parameters.
+ *
+ * @param recipeName The name of the recipe.
+ * @param navigateUp A function that navigates up in the navigation stack.
+ * @param actions A Composable that displays the actions of the top app bar.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopAppBar(
+    recipeName: String,
+    navigateUp: () -> Unit,
+    actions: @Composable () -> Unit
+) {
+    CenterAlignedTopAppBar(
+        title = {
+            Text(
+                text = recipeName,
+                style = MaterialTheme.typography.headlineMedium,
+                textAlign = TextAlign.Center
+            )
+        },
+        navigationIcon = {
+            IconButton(onClick = { navigateUp() }) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        },
+        actions = {
+            actions()
+        }
+    )
 }
 
 /**
